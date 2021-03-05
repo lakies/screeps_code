@@ -1,4 +1,5 @@
 import {creepManager} from "./creeps/creepManager";
+import {buildingManager} from "./buildings/buildingManager";
 
 export const roomDirector = {
 
@@ -33,6 +34,10 @@ export const roomDirector = {
     if (Game.time % 5 == 0) {
       creepManager.manage(roomName);
     }
+
+    if (Game.time % 20 == 0) {
+      buildingManager.manage(roomName);
+    }
   },
 
   getMineableSources(room: Room): Id<MemSource>[] {
@@ -55,7 +60,7 @@ export const roomDirector = {
 
         const mineableSource = source as MemSource;
         mineableSource.memory.flagName = flags[0].name;
-        mineableSource.memory.availableSpots = 1;// 9 - surroundingWalls.length;
+        mineableSource.memory.availableSpots = 9 - surroundingWalls.length;
         mineableSource.memory.assignedCreepNames = [];
         mineableSources.push(mineableSource);
       }

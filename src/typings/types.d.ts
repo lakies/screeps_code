@@ -20,17 +20,24 @@ interface Memory {
   ownedRoomNames?: string[];
   sourceIds: Id<MemSource>[];
   spawningSpawnNames: string[];
-  sourceMemories: SourceMemories
+  sourceMemories: CustomMemories
+  controllerMemories: CustomMemories;
 }
 
-interface SourceMemories {
-  [key: string]: SourceMemory
+interface CustomMemory {}
+
+interface CustomMemories {
+  [key: string]: CustomMemory
 }
 
-interface SourceMemory {
+interface SourceMemory extends CustomMemory{
   flagName: string;
   availableSpots: number;
   assignedCreepNames: string[];
+}
+
+interface ControllerMemory extends CustomMemory{
+
 }
 
 interface RoomMemory {

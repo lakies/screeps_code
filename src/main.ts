@@ -1,4 +1,4 @@
-import { ErrorMapper } from "utils/ErrorMapper";
+import {ErrorMapper} from "utils/ErrorMapper";
 import {roomDirector} from "./roomDirector";
 import {jobs} from "./jobs";
 import {creepDirector} from "./creeps/creepDirector";
@@ -17,7 +17,7 @@ let cleared = true;
 
 const clearMemory = () => {
   for (const name in Memory) {
-      delete (Memory as any)[name];
+    delete (Memory as any)[name];
   }
 }
 

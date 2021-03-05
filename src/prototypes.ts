@@ -7,6 +7,7 @@ export const prototypes = {
     loaded = true;
 
     this.sourceMemory();
+    this.controllerMemory();
   },
 
   sourceMemory() {
@@ -30,6 +31,31 @@ export const prototypes = {
           throw new Error('Could not set source memory');
         }
         Memory.sourceMemories[this.id] = value;
+      }
+    });
+  },
+
+  controllerMemory() {
+    Object.defineProperty(StructureController.prototype, 'memory', {
+      configurable: true,
+      get: function() {
+        if(_.isUndefined(Memory.controllerMemories)) {
+          Memory.controllerMemories = {};
+        }
+        if(!_.isObject(Memory.controllerMemories)) {
+          return undefined;
+        }
+        return Memory.controllerMemories[this.id] =
+          Memory.controllerMemories[this.id] || {};
+      },
+      set: function(value) {
+        if(_.isUndefined(Memory.controllerMemories)) {
+          Memory.controllerMemories = {};
+        }
+        if(!_.isObject(Memory.controllerMemories)) {
+          throw new Error('Could not set source memory');
+        }
+        Memory.controllerMemories[this.id] = value;
       }
     });
   }

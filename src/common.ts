@@ -1,6 +1,7 @@
 export enum CreepRole {
   MINER,
-  WORKER
+  WORKER,
+  DISTRIBUTOR
 }
 
 export const makeid = (): string => {

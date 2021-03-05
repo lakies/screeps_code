@@ -47,13 +47,15 @@ export const creepManager = {
 
     // how many creeps are currently needed
     const requiredCreeps: ExistingCreeps = {};
-    if (capacityAvailable < 550) {
+    if (capacityAvailable <= 550) {
       const maxMiners = roomMemory.sourceIds.reduce<number>((previousValue, currentValue) => {
         return previousValue + (Game.getObjectById<MemSource>(currentValue)?.memory.availableSpots ?? 0);
       }, 0)
 
       requiredCreeps[CreepRole.WORKER] = maxMiners;
     }
+
+    requiredCreeps[CreepRole.DISTRIBUTOR] = 1;
 
     // count existing creeps and their roles
     const roles = roomMemory.creepNames.map(value => Memory.creeps[value].role)

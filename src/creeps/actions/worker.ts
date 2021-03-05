@@ -48,12 +48,12 @@ export const worker = {
       return;
     }
 
-    // let controller = creep.memory.room.controller;
-    // if (controller) {
-    //   if (creep.upgradeController(controller) === ERR_NOT_IN_RANGE){
-    //     creep.moveTo(controller);
-    //   }
-    //   return;
-    // }
+    let controller = Game.rooms[creep.memory.roomName].controller;
+    if (controller) {
+      if (creep.upgradeController(controller) === ERR_NOT_IN_RANGE){
+        creep.moveTo(controller);
+      }
+      return;
+    }
   },
 }

@@ -12,9 +12,9 @@ export const jobs = {
   checkSpawningCreeps(): boolean {
     const notReady: StructureSpawn[] = [];
 
-    for (const spawn of Memory.spawningSpawns) {
-
-      console.log(JSON.stringify(Game.spawns[spawn.name].spawning));
+    for (const spawnName of Memory.spawningSpawnNames) {
+      const spawn = Game.spawns[spawnName];
+      console.log("Setting memory for new creep");
       let name = Game.spawns[spawn.name].spawning?.name;
       if (!name) {
         notReady.push(spawn);
@@ -22,16 +22,17 @@ export const jobs = {
       }
 
       const creep = Game.creeps[name];
-      let room = creep.memory.room;
-      Game.rooms[room.name].memory.creeps.push(creep);
+      let roomName = creep.memory.roomName;
+      Game.rooms[roomName].memory.creepNames.push(creep.name);
 
-      let flagName = creep.memory.assignedSource?.flagName;
+      let flagName = Game.getObjectById<MemSource>(creep.memory.assignedSourceId ?? "")?.memory.flagName;
       if (flagName) {
-        Memory.sources.filter(value => value.flagName === flagName)[0].assignedCreeps.push(creep);
+        let sourceId = Memory.sourceIds.filter(id => Game.getObjectById<MemSource>(id)?.memory.flagName === flagName)[0];
+        Game.getObjectById<MemSource>(sourceId)?.memory.assignedCreepNames.push(creep.name);
       }
     }
 
-    Memory.spawningSpawns = notReady;
+    Memory.spawningSpawnNames = notReady.map(value => value.name);
     return true;
   },
 

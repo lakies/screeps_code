@@ -25,22 +25,28 @@ export const creepSpawning = {
       }
     }
 
+    let name = "worker_" + makeid();
     return {
-      spawn: spawn,
+      spawnName: spawn.name,
       parts: parts,
-      name: "worker_" + makeid(),
+      name: name,
       memory: {
         role: CreepRole.WORKER,
-        room: room,
+        roomName: room.name,
         working: true,
-        assignedSource: this.findEmptySource()
+        assignedSourceId: this.findEmptySource().id,
+        name: name
       }
     }
   },
 
-  findEmptySource(): MineableSource {
-    for (const source of Memory.sources) {
-      if (source.availableSpots > source.assignedCreeps.length) {
+  findEmptySource(): MemSource {
+    for (const sourceId of Memory.sourceIds) {
+      const source = Game.getObjectById<MemSource>(sourceId);
+      if (!source) {
+        throw "";
+      }
+      if (source.memory.availableSpots > source.memory.assignedCreepNames.length) {
 
         return source;
       }

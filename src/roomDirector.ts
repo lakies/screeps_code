@@ -3,43 +3,43 @@ import {creepManager} from "./creeps/creepManager";
 export const roomDirector = {
 
   run(): void {
-    for (const room of this.getOwnedRooms()) {
-      this.manageRoom(room);
+    for (const roomName of this.getOwnedRoomNames()) {
+      this.manageRoom(roomName);
     }
   },
 
 
-  getOwnedRooms(): Room[] {
+  getOwnedRoomNames(): string[] {
     // Assumes only one spawn per room
-    if (!Memory.ownedRooms) {
-      let rooms: Room[] = [];
+    if (!Memory.ownedRoomNames) {
+      let roomNames: string[] = [];
       for (const spawnName in Game.spawns) {
         let spawn = Game.spawns[spawnName];
         let room: Room = spawn.room;
-        room.memory.spawns = [spawn];
-        room.memory.satelliteRooms = [];
-        room.memory.sources = this.getMineableSources(room);
-        room.memory.creeps = [];
-        rooms.push(room);
+        room.memory.spawnNames = [spawn.name];
+        room.memory.satelliteRoomNames = [];
+        room.memory.sourceIds = this.getMineableSources(room);
+        room.memory.creepNames = [];
+        roomNames.push(room.name);
       }
 
-      Memory.ownedRooms = rooms;
+      Memory.ownedRoomNames = roomNames;
     }
 
-    return Memory.ownedRooms;
+    return Memory.ownedRoomNames;
   },
 
-  manageRoom(room: Room): void {
+  manageRoom(roomName: string): void {
     if (Game.time % 5 == 0) {
-      creepManager.manage(room);
+      creepManager.manage(roomName);
     }
   },
 
-  getMineableSources(room: Room): MineableSource[] {
+  getMineableSources(room: Room): Id<MemSource>[] {
     let roomMemory = room.memory;
-    const mineableSources: MineableSource[] = [];
+    const mineableSources: MemSource[] = [];
 
-    for (const satelliteRoom of roomMemory.satelliteRooms) {
+    for (const satelliteRoom of roomMemory.satelliteRoomNames) {
 
     }
 
@@ -53,17 +53,17 @@ export const roomDirector = {
         let surroundingWalls = room.lookForAtArea(LOOK_TERRAIN, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true)
           .filter(tile => tile.terrain === "wall");
 
-        const mineableSource = source as MineableSource;
-        mineableSource.flagName = flags[0].name;
-        mineableSource.availableSpots = 9 - surroundingWalls.length;
-        mineableSource.assignedCreeps = [];
+        const mineableSource = source as MemSource;
+        mineableSource.memory.flagName = flags[0].name;
+        mineableSource.memory.availableSpots = 1;// 9 - surroundingWalls.length;
+        mineableSource.memory.assignedCreepNames = [];
         mineableSources.push(mineableSource);
       }
     }
 
-    Memory.sources =  mineableSources;
+    Memory.sourceIds =  mineableSources.map(value => value.id);
 
-    return Memory.sources;
+    return Memory.sourceIds;
   }
 
 };

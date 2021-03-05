@@ -1,8 +1,9 @@
 interface CreepMemory {
   role: number;
-  room: Room;
+  roomName: string;
   working: boolean;
-  assignedSource: MineableSource | undefined;
+  assignedSourceId: Id<MemSource> | undefined;
+  name: string;
 }
 
 declare class MiningCreep extends Creep {
@@ -16,26 +17,35 @@ interface MiningCreepMemory extends CreepMemory {
 interface Memory {
   uuid: number;
   log: any;
-  ownedRooms?: Room[];
-  sources: MineableSource[];
-  spawningSpawns: StructureSpawn[];
+  ownedRoomNames?: string[];
+  sourceIds: Id<MemSource>[];
+  spawningSpawnNames: string[];
+  sourceMemories: SourceMemories
+}
+
+interface SourceMemories {
+  [key: string]: SourceMemory
+}
+
+interface SourceMemory {
+  flagName: string;
+  availableSpots: number;
+  assignedCreepNames: string[];
 }
 
 interface RoomMemory {
-  spawns: StructureSpawn[];
-  sources: MineableSource[];
-  satelliteRooms: Room[];
-  creeps: Creep[];
+  spawnNames: string[];
+  sourceIds: Id<MemSource>[];
+  satelliteRoomNames: string[];
+  creepNames: string[];
 }
 
-interface MineableSource extends Source {
-  flagName: string;
-  availableSpots: number;
-  assignedCreeps: Creep[];
+interface MemSource extends Source {
+  memory: SourceMemory
 }
 
 interface CreepSpawn {
-  spawn: StructureSpawn;
+  spawnName: string;
   parts: BodyPartConstant[];
   name: string;
   memory: CreepMemory;

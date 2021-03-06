@@ -44,7 +44,7 @@ export const buildingManager = {
       throw "";
     }
     const maxAmount = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][controller?.level];
-    if (extensions.length + extensionConstructions.length < maxAmount) {
+    if (extensionConstructions.length == 0 && extensions.length < maxAmount) {
       const spawn = Game.spawns[room.memory.spawnNames[0]];
       const spawnPos = spawn.pos;
 

@@ -1,3 +1,5 @@
+import {CreepState} from "../../common";
+
 export const worker = {
   work(creep: Creep) {
 
@@ -16,7 +18,13 @@ export const worker = {
 
       if (creep.store[RESOURCE_ENERGY] === creep.store.getCapacity()) {
         creep.memory.working = true;
-        creep.say("working");
+        if (Math.random() < 0.1) {
+          creep.memory.state = CreepState.UPGRADING;
+          creep.say("upgrading");
+        } else {
+          creep.memory.state = CreepState.BUILDING;
+          creep.say("building");
+        }
       } else {
         return;
       }
@@ -29,31 +37,43 @@ export const worker = {
     }
 
 
-    let room = Memory.rooms[creep.memory.roomName];
-    let spawnName = room.spawnNames[0];
-    const structureSpawn = Game.spawns[spawnName];
-    if (structureSpawn && structureSpawn.store[RESOURCE_ENERGY] < structureSpawn.store.getCapacity(RESOURCE_ENERGY)) {
-      if(creep.transfer(structureSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(structureSpawn);
+    if (creep.memory.state !== CreepState.UPGRADING) {
+      let room = Memory.rooms[creep.memory.roomName];
+      let spawnName = room.spawnNames[0];
+      const structureSpawn = Game.spawns[spawnName];
+      if (structureSpawn && structureSpawn.store[RESOURCE_ENERGY] < structureSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+        if(creep.transfer(structureSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(structureSpawn);
+        }
+        return;
       }
-      return;
     }
 
     // TODO: Optimize building
-    const target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
-    if(target) {
-      if(creep.build(target) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target);
+    if (creep.memory.state === CreepState.BUILDING) {
+      let target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES, {filter: obj => obj.structureType !== STRUCTURE_ROAD});
+      if (!target)
+        target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES, {filter: obj => obj.structureType === STRUCTURE_ROAD});
+
+      if(target) {
+        if(creep.build(target) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(target);
+        }
+        return;
+      } else {
+        creep.memory.state = CreepState.UPGRADING;
+        this.work(creep);
       }
-      return;
     }
 
-    let controller = Game.rooms[creep.memory.roomName].controller;
-    if (controller) {
-      if (creep.upgradeController(controller) === ERR_NOT_IN_RANGE){
-        creep.moveTo(controller);
+    if (creep.memory.state === CreepState.UPGRADING) {
+      let controller = Game.rooms[creep.memory.roomName].controller;
+      if (controller) {
+        if (creep.upgradeController(controller) === ERR_NOT_IN_RANGE){
+          creep.moveTo(controller);
+        }
+        return;
       }
-      return;
     }
   },
 }

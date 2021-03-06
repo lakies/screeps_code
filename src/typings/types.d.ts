@@ -4,6 +4,8 @@ interface CreepMemory {
   working: boolean;
   assignedSourceId: Id<MemSource> | undefined;
   name: string;
+  isUpgrading: boolean;
+  state: number;
 }
 
 declare class MiningCreep extends Creep {

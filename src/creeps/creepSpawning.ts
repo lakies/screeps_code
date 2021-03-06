@@ -1,4 +1,4 @@
-import {CreepRole, makeid} from "../common";
+import {CreepRole, CreepState, makeid} from "../common";
 
 export const creepSpawning = {
   createCreep(spawn: StructureSpawn, role: CreepRole, maxEnergy: number, room: Room): CreepSpawn {
@@ -38,7 +38,9 @@ export const creepSpawning = {
         roomName: room.name,
         working: false,
         assignedSourceId: undefined,
-        name: name
+        name: name,
+        isUpgrading: false,
+        state: CreepState.BUILDING
       }
     }
   },
@@ -63,7 +65,9 @@ export const creepSpawning = {
         roomName: room.name,
         working: true,
         assignedSourceId: this.findEmptySource().id,
-        name: name
+        name: name,
+        isUpgrading: false,
+        state: CreepState.BUILDING
       }
     }
   },

@@ -4,6 +4,11 @@ export enum CreepRole {
   DISTRIBUTOR
 }
 
+export enum CreepState {
+  UPGRADING,
+  BUILDING
+}
+
 export const makeid = (): string => {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -17,6 +17,9 @@ export const creepDirector = {
       return;
     }
 
+    // const roomName = creep.memory.roomName;
+    // Game.rooms[roomName].createConstructionSite(creep.pos, STRUCTURE_ROAD);
+
     switch (creep.memory.role) {
       case CreepRole.MINER:
         // this.mine(creep as MiningCreep);

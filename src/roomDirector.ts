@@ -6,6 +6,10 @@ export const roomDirector = {
   run(): void {
     for (const roomName of this.getOwnedRoomNames()) {
       this.manageRoom(roomName);
+
+      if (Game.time % 10 == 0) {
+        this.checkSources(roomName)
+      }
     }
   },
 
@@ -35,9 +39,15 @@ export const roomDirector = {
       creepManager.manage(roomName);
     }
 
-    if (Game.time % 20 == 0) {
+    if (Game.time % 20 == 1) {
       buildingManager.manage(roomName);
     }
+  },
+
+  getAvailableSpots(room: Room, pos: RoomPosition): number {
+    const surroundingWalls = room.lookForAtArea(LOOK_TERRAIN, pos.y - 1, pos.x - 1, pos.y + 1, pos.x + 1, true)
+      .filter(tile => tile.terrain === "wall");
+    return 9 - surroundingWalls.length;
   },
 
   getMineableSources(room: Room): Id<MemSource>[] {
@@ -55,13 +65,13 @@ export const roomDirector = {
 
       flags = flags.filter(flag => flag.name.startsWith("source_"));
       if (flags.length > 0) {
-        let surroundingWalls = room.lookForAtArea(LOOK_TERRAIN, source.pos.y - 1, source.pos.x - 1, source.pos.y + 1, source.pos.x + 1, true)
-          .filter(tile => tile.terrain === "wall");
+
 
         const mineableSource = source as MemSource;
         mineableSource.memory.flagName = flags[0].name;
-        mineableSource.memory.availableSpots = 9 - surroundingWalls.length;
+        mineableSource.memory.availableSpots = this.getAvailableSpots(room, source.pos);
         mineableSource.memory.assignedCreepNames = [];
+        mineableSource.memory.needMiner = true;
         mineableSources.push(mineableSource);
       }
     }
@@ -69,6 +79,33 @@ export const roomDirector = {
     Memory.sourceIds =  mineableSources.map(value => value.id);
 
     return Memory.sourceIds;
+  },
+
+  checkSources(roomName: string) {
+    const room = Game.rooms[roomName];
+    for (const sourceId of room.memory.sourceIds) {
+      const source = Game.getObjectById<MemSource>(sourceId);
+      if (!source) {
+        continue;
+      }
+
+      if (source.memory.minerName && source.memory.availableSpots > 0) {
+        source.memory.availableSpots = 0;
+      }
+
+      if (!source.memory.minerName && source.memory.availableSpots === 0) {
+        if (source.memory.timeWithoutMiners === undefined) {
+          source.memory.timeWithoutMiners = 5;
+        }
+
+        console.log("Source " + source.id + " has no miner");
+        source.memory.timeWithoutMiners--;
+
+        if (source.memory.timeWithoutMiners === 0) {
+          source.memory.availableSpots = this.getAvailableSpots(room, source.pos);
+        }
+      }
+    }
   }
 
 };

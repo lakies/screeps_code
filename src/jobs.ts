@@ -1,3 +1,8 @@
+import {CreepRole} from "./common";
+import {miner} from "./creeps/types/miner";
+import {hauler} from "./creeps/types/hauler";
+import {worker} from "./creeps/types/worker";
+
 let flagsPlaced = false;
 let flagCount = 0;
 
@@ -21,14 +26,19 @@ export const jobs = {
         continue;
       }
 
+      console.log(name);
       const creep = Game.creeps[name];
-      let roomName = creep.memory.roomName;
-      Game.rooms[roomName].memory.creepNames.push(creep.name);
 
-      let flagName = Game.getObjectById<MemSource>(creep.memory.assignedSourceId ?? "")?.memory.flagName;
-      if (flagName) {
-        let sourceId = Memory.sourceIds.filter(id => Game.getObjectById<MemSource>(id)?.memory.flagName === flagName)[0];
-        Game.getObjectById<MemSource>(sourceId)?.memory.assignedCreepNames.push(creep.name);
+      switch (creep.memory.role) {
+        case CreepRole.MINER:
+          miner.onSpawn(creep);
+          break;
+        case CreepRole.HAULER:
+          hauler.onSpawn(creep);
+          break;
+        case CreepRole.WORKER:
+          worker.onSpawn(creep);
+          break;
       }
     }
 
@@ -54,5 +64,6 @@ export const jobs = {
       }
     }
     return false;
-  }
+  },
+
 }

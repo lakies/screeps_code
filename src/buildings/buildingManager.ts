@@ -1,3 +1,5 @@
+import {roadBuilder} from "./roadBuilder";
+
 interface MissingStructure {
   type: BuildableStructureConstant,
   pos: Pos
@@ -21,6 +23,10 @@ export const buildingManager = {
         structure.type
       )
     }
+
+    if (room.energyCapacityAvailable > 400) {
+      roadBuilder.build(room);
+    }
   },
 
   findMissingStructure(room: Room): MissingStructure | undefined {
@@ -31,7 +37,61 @@ export const buildingManager = {
       return missingExtension;
     }
 
+    const missingContainer = this.findMissingContainers(room);
+    if (missingContainer) {
+      return missingContainer;
+    }
+
     return undefined;
+  },
+
+  findMissingContainers(room: Room): MissingStructure | undefined {
+
+    if (room.energyCapacityAvailable < 550) {
+      return;
+    }
+
+    const containers = this.find(room, STRUCTURE_CONTAINER);
+    const containerConstructions = room.find(FIND_CONSTRUCTION_SITES)
+      .filter(value => value.structureType === STRUCTURE_CONTAINER);
+
+    const controller = room.controller;
+    if (!controller) {
+      throw "";
+    }
+    const maxAmount = CONTROLLER_STRUCTURES[STRUCTURE_CONTAINER][controller?.level];
+
+    if (containerConstructions.length == 0 && containers.length < maxAmount) {
+      const spawn = Game.spawns[room.memory.spawnNames[0]];
+      const spawnPos = spawn.pos;
+
+      const grid = this.createGrid(maxAmount, false);
+      for (const pos of grid) {
+        const x = pos.x + spawnPos.x;
+        const y = pos.y + spawnPos.y;
+        const constructionSites = room.lookForAt(LOOK_CONSTRUCTION_SITES, x, y);
+        const structures = room.lookForAt(LOOK_STRUCTURES, x, y);
+        const notWall = room.lookForAt(LOOK_TERRAIN, x, y)
+          .filter(value => value === "plain")
+
+        if (constructionSites.length || structures.length || !notWall.length) {
+          continue;
+        }
+
+        return {
+          type: STRUCTURE_CONTAINER,
+          pos: {
+            x: x,
+            y: y
+          }
+        }
+      }
+    } else {
+      return undefined;
+    }
+    console.log("Cannot find spot for container");
+    throw "";
+
   },
 
   findMissingExtension(room: Room): MissingStructure | undefined {
@@ -48,7 +108,7 @@ export const buildingManager = {
       const spawn = Game.spawns[room.memory.spawnNames[0]];
       const spawnPos = spawn.pos;
 
-      const grid = this.createGrid(maxAmount);
+      const grid = this.createGrid(maxAmount, true);
       for (const pos of grid) {
         const x = pos.x + spawnPos.x;
         const y = pos.y + spawnPos.y;
@@ -88,7 +148,7 @@ export const buildingManager = {
       .map(site => (site as ConstructionSite<T>));
   },
 
-  createGrid(max: number): Pos[] {
+  createGrid(max: number, diagonal: boolean): Pos[] {
     let positions: Pos[] = [];
 
     const sideLen = Math.max(Math.ceil(Math.sqrt(max * 2 + 1)), 3);
@@ -96,7 +156,7 @@ export const buildingManager = {
 
     for (let x = -halfSideLen; x <= halfSideLen; x++) {
       for (let y = -halfSideLen; y <= halfSideLen; y++) {
-        if ((x + y) % 2 === 0) {
+        if ((x + y) % 2 === (diagonal ? 0 : 1)) {
           positions.push({
             x: x,
             y: y

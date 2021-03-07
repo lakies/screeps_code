@@ -1,12 +1,17 @@
 export enum CreepRole {
-  MINER,
   WORKER,
-  DISTRIBUTOR
+  HAULER,
+  MINER,
 }
 
 export enum CreepState {
   UPGRADING,
-  BUILDING
+  BUILDING,
+  FILL_EXTENSION,
+  FETCH_MINED,
+  DEPOSIT_MINED,
+  MINING,
+  GET_ENERGY
 }
 
 export const makeid = (): string => {

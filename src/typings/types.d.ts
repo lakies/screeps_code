@@ -4,16 +4,25 @@ interface CreepMemory {
   working: boolean;
   assignedSourceId: Id<MemSource> | undefined;
   name: string;
-  isUpgrading: boolean;
   state: number;
 }
 
-declare class MiningCreep extends Creep {
+declare class Miner extends Creep {
   memory: MiningCreepMemory;
 }
 
 interface MiningCreepMemory extends CreepMemory {
-  isDedicated: boolean;
+  assignedHaulerName: string | undefined;
+  needHauler: boolean;
+}
+
+declare class Hauler extends Creep {
+  memory: HaulerMemory;
+}
+
+interface HaulerMemory extends CreepMemory {
+  minerName: string | undefined;
+
 }
 
 interface Memory {
@@ -22,8 +31,9 @@ interface Memory {
   ownedRoomNames?: string[];
   sourceIds: Id<MemSource>[];
   spawningSpawnNames: string[];
-  sourceMemories: CustomMemories
+  sourceMemories: CustomMemories;
   controllerMemories: CustomMemories;
+  misc: any
 }
 
 interface CustomMemory {}
@@ -36,10 +46,14 @@ interface SourceMemory extends CustomMemory{
   flagName: string;
   availableSpots: number;
   assignedCreepNames: string[];
+  roadBuilt: boolean;
+  minerName: string | undefined;
+  needMiner: boolean;
+  timeWithoutMiners: number | undefined;
 }
 
 interface ControllerMemory extends CustomMemory{
-
+  roadBuilt: boolean;
 }
 
 interface RoomMemory {
@@ -53,11 +67,15 @@ interface MemSource extends Source {
   memory: SourceMemory
 }
 
-interface CreepSpawn {
+interface MemController extends StructureController {
+  memory: ControllerMemory
+}
+
+interface CreepSpawn<T extends CreepMemory> {
   spawnName: string;
   parts: BodyPartConstant[];
   name: string;
-  memory: CreepMemory;
+  memory: T;
 }
 
 // `global` extension samples

@@ -10,6 +10,7 @@ import {prototypes} from "./prototypes";
 const initMemory = () => {
   if (Memory.spawningSpawnNames === undefined) {
     Memory.spawningSpawnNames = [];
+    Memory.misc = {};
   }
 }
 

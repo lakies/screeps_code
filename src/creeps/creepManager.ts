@@ -23,7 +23,7 @@ export const creepManager = {
     }
   },
 
-  spawnCreeps(room: Room, neededCreeps: CreepSpawn[]) {
+  spawnCreeps(room: Room, neededCreeps: CreepSpawn<CreepMemory>[]) {
     const roomMemory = Memory.rooms[room.name];
 
     const newCreep = neededCreeps[0];
@@ -41,21 +41,34 @@ export const creepManager = {
     }
   },
 
-  calculateMissingCreeps(room: Room): CreepSpawn[] {
+  calculateMissingCreeps(room: Room): CreepSpawn<CreepMemory>[] {
     let roomMemory = Memory.rooms[room.name];
     let capacityAvailable = room.energyCapacityAvailable;
 
     // how many creeps are currently needed
     const requiredCreeps: ExistingCreeps = {};
-    if (capacityAvailable <= 550) {
+    requiredCreeps[CreepRole.HAULER] = 1;
+    if (capacityAvailable < 550) {
       const maxMiners = roomMemory.sourceIds.reduce<number>((previousValue, currentValue) => {
         return previousValue + (Game.getObjectById<MemSource>(currentValue)?.memory.availableSpots ?? 0);
       }, 0)
 
-      requiredCreeps[CreepRole.WORKER] = maxMiners;
+      requiredCreeps[CreepRole.WORKER] = maxMiners - 1;
+    } else {
+      requiredCreeps[CreepRole.MINER] = roomMemory.sourceIds.length;
+      for (const sourceId of roomMemory.sourceIds) {
+        if (Game.getObjectById<MemSource>(sourceId)?.memory.needMiner !== false) {
+          requiredCreeps[CreepRole.MINER]++;
+        }
+      }
+
+      requiredCreeps[CreepRole.HAULER] += Object.keys(Game.creeps).filter(value => Game.creeps[value].memory.role === CreepRole.MINER).length;
+
+      requiredCreeps[CreepRole.WORKER] = 4;
     }
 
-    requiredCreeps[CreepRole.DISTRIBUTOR] = 1;
+    // requiredCreeps[CreepRole.HAULER] = 2;
+    // requiredCreeps[CreepRole.MINER] = 2;
 
     // count existing creeps and their roles
     const roles = roomMemory.creepNames.map(value => Memory.creeps[value].role)
@@ -76,12 +89,13 @@ export const creepManager = {
     }
 
     // create CreepSpawn instances based on missing creeps
-    const missingCreeps: CreepSpawn[] = [];
+    const missingCreeps: CreepSpawn<CreepMemory>[] = [];
+
     for (const role in requiredCreeps) {
       const count = requiredCreeps[role];
 
       for (let i = 0; i < count; i++) {
-        missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), room.energyAvailable, room))
+        missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), room.energyCapacityAvailable, room))
       }
     }
 

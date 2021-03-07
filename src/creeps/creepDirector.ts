@@ -1,6 +1,7 @@
 import {CreepRole} from "../common";
-import {worker} from "./actions/worker";
-import {hauler} from "./actions/hauler";
+import {worker} from "./types/worker";
+import {hauler} from "./types/hauler";
+import {miner} from "./types/miner";
 
 export const creepDirector = {
   run: function (): void {
@@ -12,7 +13,7 @@ export const creepDirector = {
 
   handleCreep(creep: Creep): void {
 
-    if ((creep.ticksToLive ?? 0) < 500) {
+    if (!creep.spawning && (creep.ticksToLive ?? 0) < 2 || (creep.memory as any).kill) {
       this.destroyCreep(creep);
       return;
     }
@@ -22,15 +23,13 @@ export const creepDirector = {
 
     switch (creep.memory.role) {
       case CreepRole.MINER:
-        // this.mine(creep as MiningCreep);
+        miner.work(creep);
         break;
-
-
       case CreepRole.WORKER:
         worker.work(creep);
         break;
 
-      case CreepRole.DISTRIBUTOR:
+      case CreepRole.HAULER:
         hauler.work(creep);
         break;
     }
@@ -56,6 +55,19 @@ export const creepDirector = {
   // },
 
   destroyCreep(creep: Creep) {
+
+    switch (creep.memory.role) {
+      case CreepRole.MINER:
+        miner.onDestroy(creep);
+        break;
+      case CreepRole.WORKER:
+        worker.onDestroy(creep);
+        break;
+      case CreepRole.HAULER:
+        hauler.onDestroy(creep);
+        break;
+    }
+
     creep.suicide();
   }
 };

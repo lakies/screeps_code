@@ -69,6 +69,9 @@ export const hauler = {
       }
 
       const miner = Game.creeps[creep.memory.minerName];
+      if (!miner) { // prbably spawning
+        return;
+      }
       const resources = miner.pos.lookFor<LOOK_RESOURCES>(LOOK_RESOURCES);
       if (resources.length) {
         const result = creep.pickup(resources[0]);
@@ -141,7 +144,8 @@ export const hauler = {
         assignedSourceId: undefined,
         name: name,
         state: CreepState.FILL_EXTENSION,
-        minerName: undefined
+        minerName: undefined,
+        path: undefined
       }
     }
   },

@@ -5,6 +5,7 @@ interface CreepMemory {
   assignedSourceId: Id<MemSource> | undefined;
   name: string;
   state: number;
+  path: PathStep[] | undefined;
 }
 
 declare class Miner extends Creep {
@@ -14,6 +15,15 @@ declare class Miner extends Creep {
 interface MiningCreepMemory extends CreepMemory {
   assignedHaulerName: string | undefined;
   needHauler: boolean;
+}
+
+
+declare class Worker extends Creep {
+  memory: WorkerMemory;
+}
+
+interface WorkerMemory extends CreepMemory {
+  tookEnergyFromSpawn: boolean;
 }
 
 declare class Hauler extends Creep {
@@ -76,6 +86,11 @@ interface CreepSpawn<T extends CreepMemory> {
   parts: BodyPartConstant[];
   name: string;
   memory: T;
+}
+
+interface Pos {
+  x: number,
+  y: number
 }
 
 // `global` extension samples

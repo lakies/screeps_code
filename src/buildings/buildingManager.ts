@@ -70,9 +70,11 @@ export const buildingManager = {
         const x = pos.x + spawnPos.x;
         const y = pos.y + spawnPos.y;
         const constructionSites = room.lookForAt(LOOK_CONSTRUCTION_SITES, x, y);
-        const structures = room.lookForAt(LOOK_STRUCTURES, x, y);
+        const structures = room.lookForAt(LOOK_STRUCTURES, x, y).filter(value => value.structureType !== STRUCTURE_ROAD);
         const notWall = room.lookForAt(LOOK_TERRAIN, x, y)
-          .filter(value => value === "plain")
+          .filter(value => value === "plain");
+
+        console.log(JSON.stringify(notWall));
 
         if (constructionSites.length || structures.length || !notWall.length) {
           continue;

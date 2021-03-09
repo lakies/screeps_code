@@ -13,13 +13,28 @@ export const creepDirector = {
 
   handleCreep(creep: Creep): void {
 
-    if (!creep.spawning && (creep.ticksToLive ?? 0) < 2 || (creep.memory as any).kill) {
+    if (creep.ticksToLive == 2 || (creep.memory as any).kill) {
       this.destroyCreep(creep);
       return;
     }
 
     // const roomName = creep.memory.roomName;
     // Game.rooms[roomName].createConstructionSite(creep.pos, STRUCTURE_ROAD);
+
+    if (creep.memory.path) {
+      if (creep.memory.path.length === 0) {
+        creep.memory.path = undefined;
+
+      } else {
+        creep.moveByPath(creep.memory.path);
+        const pathStep = creep.memory.path[creep.memory.path.length - 1];
+        if (creep.pos.x === pathStep.x && creep.pos.y === pathStep.y) {
+          creep.memory.path = undefined;
+        } else {
+          return;
+        }
+      }
+    }
 
     switch (creep.memory.role) {
       case CreepRole.MINER:

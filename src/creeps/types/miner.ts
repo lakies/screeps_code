@@ -52,7 +52,8 @@ export const miner = {
         name: name,
         state: CreepState.BUILDING,
         assignedHaulerName: undefined,
-        needHauler: false
+        needHauler: false,
+        path: undefined
       }
     }
   },

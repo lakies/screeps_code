@@ -40,7 +40,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
       let room = Game.rooms[creep.roomName];
       room.memory.creepNames = room.memory.creepNames.filter(name => name !== creep.name);
       let sourceId = creep.assignedSourceId;
-      if (sourceId !== undefined) {
+      if (sourceId) {
         let assignedSourceId = Memory.sourceIds.filter(value => Game.getObjectById<MemSource>(value)?.memory.flagName === Game.getObjectById<MemSource>(sourceId ?? "")?.memory.flagName)[0];
         const source = Game.getObjectById<MemSource>(assignedSourceId) ?? {} as MemSource;
         source.memory.assignedCreepNames = source.memory.assignedCreepNames.filter(name => name !== creep.name);

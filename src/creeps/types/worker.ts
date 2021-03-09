@@ -1,4 +1,4 @@
-import {CreepRole, CreepState, makeid} from "../../common";
+import {addPos, CreepRole, CreepState, linearDist, makeid, roomPosToPos, subtractPos} from "../../common";
 
 export const worker = {
   work(creep: Creep) {
@@ -10,6 +10,7 @@ export const worker = {
           creep.say("mining");
           creep.memory.state = CreepState.MINING;
           this.work(creep);
+          return;
         }
 
         const roomName = creep.memory.roomName;
@@ -17,9 +18,23 @@ export const worker = {
         const containers = room.find(FIND_STRUCTURES).filter(value => value.structureType === STRUCTURE_CONTAINER)
           .filter(value => (value as StructureContainer).store[RESOURCE_ENERGY] > 0);
 
+        const worker = creep as Worker;
         if (containers.length) {
           if (creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.moveTo(containers[0]);
+          } else {
+            worker.memory.tookEnergyFromSpawn = false;
+          }
+        } else {
+          let room = Memory.rooms[creep.memory.roomName];
+          let spawnName = room.spawnNames[0];
+          const structureSpawn = Game.spawns[spawnName];
+          if (structureSpawn && structureSpawn.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
+            if (creep.withdraw(structureSpawn, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+              creep.moveTo(structureSpawn);
+            } else {
+              worker.memory.tookEnergyFromSpawn = true;
+            }
           }
         }
 
@@ -28,15 +43,12 @@ export const worker = {
           let room = Memory.rooms[creep.memory.roomName];
           let spawnName = room.spawnNames[0];
           const structureSpawn = Game.spawns[spawnName];
-          if (structureSpawn && structureSpawn.store[RESOURCE_ENERGY] < structureSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+          if (!worker.memory.tookEnergyFromSpawn && structureSpawn && structureSpawn.store[RESOURCE_ENERGY] < structureSpawn.store.getCapacity(RESOURCE_ENERGY)) {
             creep.memory.state = CreepState.DEPOSIT_MINED;
-            creep.say("depositing");
           } else if (Math.random() < 0.1) {
             creep.memory.state = CreepState.UPGRADING;
-            creep.say("upgrading");
           } else {
             creep.memory.state = CreepState.BUILDING;
-            creep.say("building");
           }
         }
 
@@ -64,13 +76,10 @@ export const worker = {
           const structureSpawn = Game.spawns[spawnName];
           if (structureSpawn && structureSpawn.store[RESOURCE_ENERGY] < structureSpawn.store.getCapacity(RESOURCE_ENERGY)) {
             creep.memory.state = CreepState.DEPOSIT_MINED;
-            creep.say("depositing");
           } else if (Math.random() < 0.1) {
             creep.memory.state = CreepState.UPGRADING;
-            creep.say("upgrading");
           } else {
             creep.memory.state = CreepState.BUILDING;
-            creep.say("building");
           }
         }
         break;
@@ -88,6 +97,19 @@ export const worker = {
           target = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES, {filter: obj => obj.structureType === STRUCTURE_ROAD});
 
         if(target) {
+
+          let room = Memory.rooms[creep.memory.roomName];
+          let spawnName = room.spawnNames[0];
+          const structureSpawn = Game.spawns[spawnName];
+          if (linearDist(creep.pos, structureSpawn.pos) === 1) {
+            let creepPos = roomPosToPos(creep.pos);
+            const roomPos = roomPosToPos(structureSpawn.pos);
+            const diff = subtractPos(creepPos, roomPos);
+            creepPos = addPos(addPos(creepPos, diff), diff);
+            creep.memory.path = creep.pos.findPathTo(creepPos.x, creepPos.y);
+            return;
+          }
+
           if(creep.build(target) == ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
           }
@@ -136,7 +158,7 @@ export const worker = {
     }
   },
 
-  create(room: Room, spawn: StructureSpawn, maxEnergy: number): CreepSpawn<CreepMemory> {
+  create(room: Room, spawn: StructureSpawn, maxEnergy: number): CreepSpawn<WorkerMemory> {
     const base = [MOVE, WORK, CARRY];
     const parts: BodyPartConstant[] = [];
 
@@ -157,7 +179,9 @@ export const worker = {
         working: true,
         assignedSourceId: this.findEmptySourceId(),
         name: name,
-        state: CreepState.GET_ENERGY
+        state: CreepState.GET_ENERGY,
+        tookEnergyFromSpawn: false,
+        path: undefined
       }
     }
   },

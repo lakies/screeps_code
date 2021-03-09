@@ -47,7 +47,7 @@ export const creepManager = {
 
     // how many creeps are currently needed
     const requiredCreeps: ExistingCreeps = {};
-    requiredCreeps[CreepRole.HAULER] = 1;
+    requiredCreeps[CreepRole.HAULER] = 2;
     if (capacityAvailable < 550) {
       const maxMiners = roomMemory.sourceIds.reduce<number>((previousValue, currentValue) => {
         return previousValue + (Game.getObjectById<MemSource>(currentValue)?.memory.availableSpots ?? 0);
@@ -91,11 +91,13 @@ export const creepManager = {
     // create CreepSpawn instances based on missing creeps
     const missingCreeps: CreepSpawn<CreepMemory>[] = [];
 
+    const maxEnergy = Object.keys(Game.creeps).filter(value => Game.creeps[value].memory.role === CreepRole.HAULER).length ? room.energyCapacityAvailable : room.energyAvailable;
+
     for (const role in requiredCreeps) {
       const count = requiredCreeps[role];
 
       for (let i = 0; i < count; i++) {
-        missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), room.energyCapacityAvailable, room))
+        missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), maxEnergy, room));
       }
     }
 

@@ -1,5 +1,6 @@
 import {creepManager} from "./creeps/creepManager";
 import {buildingManager} from "./buildings/buildingManager";
+import {CreepRole} from "./common";
 
 export const roomDirector = {
 
@@ -91,6 +92,16 @@ export const roomDirector = {
 
       if (source.memory.minerName && source.memory.availableSpots > 0) {
         source.memory.availableSpots = 0;
+        // for (const creep in Game.creeps) {
+        //   const worker = Game.creeps[creep];
+        //   if (worker.memory.role === CreepRole.WORKER && worker.memory.assignedSourceId === sourceId) {
+        //     worker.memory.assignedSourceId = undefined;
+        //   }
+        // }
+      }
+
+      if (!source.memory.minerName && source.memory.availableSpots > 0) {
+        source.memory.needMiner = true;
       }
 
       if (!source.memory.minerName && source.memory.availableSpots === 0) {

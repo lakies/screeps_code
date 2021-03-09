@@ -91,7 +91,8 @@ export const creepManager = {
     // create CreepSpawn instances based on missing creeps
     const missingCreeps: CreepSpawn<CreepMemory>[] = [];
 
-    const maxEnergy = Object.keys(Game.creeps).filter(value => Game.creeps[value].memory.role === CreepRole.HAULER).length ? room.energyCapacityAvailable : room.energyAvailable;
+    const maxEnergy = Object.keys(Game.creeps).filter(value => Game.creeps[value].memory.role === CreepRole.HAULER ||
+      Game.creeps[value].memory.role === CreepRole.MINER).length > 2 ? room.energyCapacityAvailable : room.energyAvailable;
 
     for (const role in requiredCreeps) {
       const count = requiredCreeps[role];
@@ -100,6 +101,7 @@ export const creepManager = {
         missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), maxEnergy, room));
       }
     }
+
 
 
     return missingCreeps;

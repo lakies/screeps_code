@@ -59,7 +59,7 @@ export const buildingManager = {
     if (!controller) {
       throw "";
     }
-    const maxAmount = CONTROLLER_STRUCTURES[STRUCTURE_CONTAINER][controller?.level];
+    const maxAmount = Math.min(CONTROLLER_STRUCTURES[STRUCTURE_CONTAINER][controller?.level], 3);
 
     if (containerConstructions.length == 0 && containers.length < maxAmount) {
       const spawn = Game.spawns[room.memory.spawnNames[0]];

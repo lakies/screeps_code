@@ -112,8 +112,9 @@ export const roomDirector = {
         console.log("Source " + source.id + " has no miner");
         source.memory.timeWithoutMiners--;
 
-        if (source.memory.timeWithoutMiners === 0) {
+        if (source.memory.timeWithoutMiners <= 0) {
           source.memory.availableSpots = this.getAvailableSpots(room, source.pos);
+          source.memory.timeWithoutMiners = 5;
         }
       }
     }

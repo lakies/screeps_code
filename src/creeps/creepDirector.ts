@@ -2,6 +2,7 @@ import {CreepRole} from "../common";
 import {worker} from "./types/worker";
 import {hauler} from "./types/hauler";
 import {miner} from "./types/miner";
+import {attacker} from "./types/attacker";
 
 export const creepDirector = {
   run: function (): void {
@@ -47,6 +48,10 @@ export const creepDirector = {
       case CreepRole.HAULER:
         hauler.work(creep);
         break;
+
+      case CreepRole.ATTACKER:
+        attacker.work(creep);
+        break;
     }
   },
 
@@ -80,6 +85,10 @@ export const creepDirector = {
         break;
       case CreepRole.HAULER:
         hauler.onDestroy(creep);
+        break;
+
+      case CreepRole.ATTACKER:
+        attacker.onDestroy(creep);
         break;
     }
 

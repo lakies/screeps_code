@@ -2,6 +2,7 @@ import {CreepRole} from "./common";
 import {miner} from "./creeps/types/miner";
 import {hauler} from "./creeps/types/hauler";
 import {worker} from "./creeps/types/worker";
+import {attacker} from "./creeps/types/attacker";
 
 let flagsPlaced = false;
 let flagCount = 0;
@@ -38,6 +39,10 @@ export const jobs = {
           break;
         case CreepRole.WORKER:
           worker.onSpawn(creep);
+          break;
+
+        case CreepRole.ATTACKER:
+          attacker.onSpawn(creep);
           break;
       }
     }

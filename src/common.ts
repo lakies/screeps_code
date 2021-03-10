@@ -2,16 +2,21 @@ export enum CreepRole {
   WORKER,
   HAULER,
   MINER,
+  ATTACKER
 }
 
 export enum CreepState {
   UPGRADING,
   BUILDING,
-  FILL_EXTENSION,
+  FILL,
   FETCH_MINED,
   DEPOSIT_MINED,
   MINING,
-  GET_ENERGY
+  GET_ENERGY,
+  ATTACKING,
+  RETURNING,
+  MOVING,
+  WAITING
 }
 
 export const makeid = (): string => {
@@ -24,7 +29,13 @@ export const makeid = (): string => {
   return result;
 }
 
-export const linearDist = (pos1: RoomPosition, pos2: RoomPosition): number => {
+export const linearRoomDist = (pos1: RoomPosition, pos2: RoomPosition): number => {
+  const diffX = pos1.x - pos2.x;
+  const diffY = pos1.y - pos2.y;
+  return Math.sqrt(diffX * diffX + diffY * diffY);
+}
+
+export const linearDist = (pos1: Pos, pos2: Pos): number => {
   const diffX = pos1.x - pos2.x;
   const diffY = pos1.y - pos2.y;
   return Math.sqrt(diffX * diffX + diffY * diffY);

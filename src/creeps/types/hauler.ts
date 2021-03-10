@@ -22,21 +22,30 @@ export const hauler = {
 
   runState(creep: Hauler) {
     const room = Game.rooms[creep.memory.roomName];
-    if (creep.memory.state === CreepState.FILL_EXTENSION) {
+    if (creep.memory.state === CreepState.FILL) {
 
       // TODO: store this in room memory
       const extensions = room.find(FIND_STRUCTURES).filter(structure => structure.structureType === STRUCTURE_EXTENSION)
         .filter(extension => extension && ((extension as StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY ?? 0 > 0)));
 
+      const towers = room.find(FIND_STRUCTURES).filter(structure => structure.structureType === STRUCTURE_TOWER)
+        .filter(tower => tower && ((tower as StructureTower).store.getFreeCapacity(RESOURCE_ENERGY ?? 0 > 0)));
 
-      if (extensions.length) {
+
+      if (extensions.length + towers.length) {
         if (creep.store[RESOURCE_ENERGY] < 50) {
           this.fetchEnergyFromStorage(creep);
           return;
         }
-        let extension = extensions[0];
-        if (creep.transfer(extension, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(extension);
+
+        let target;
+        if (extensions.length) {
+          target = extensions[0];
+        } else {
+          target = towers[0];
+        }
+        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(target);
         }
       } else {
         creep.memory.state = CreepState.FETCH_MINED;
@@ -62,7 +71,7 @@ export const hauler = {
         if (creep.store[RESOURCE_ENERGY] >= 50) {
           creep.memory.state = CreepState.DEPOSIT_MINED;
         } else {
-          creep.memory.state = CreepState.FILL_EXTENSION;
+          creep.memory.state = CreepState.FILL;
         }
 
         return;
@@ -88,7 +97,7 @@ export const hauler = {
 
     } else if (creep.memory.state === CreepState.DEPOSIT_MINED) {
       if (creep.store[RESOURCE_ENERGY] == 0) {
-        creep.memory.state = CreepState.FILL_EXTENSION;
+        creep.memory.state = CreepState.FILL;
         return;
       }
 
@@ -115,7 +124,17 @@ export const hauler = {
       }
 
 
-      creep.memory.state = CreepState.FILL_EXTENSION;
+      const storages = room.find(FIND_STRUCTURES).filter(structure => structure.structureType === STRUCTURE_STORAGE)
+        .filter(tower => tower && ((tower as StructureStorage).store.getFreeCapacity(RESOURCE_ENERGY ?? 0 > 0)));
+      if (storages.length) {
+        if (creep.transfer(storages[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(storages[0]);
+        }
+        return;
+      }
+
+
+      creep.memory.state = CreepState.FILL;
     } else {
       console.log("undefined state for hauler " + creep.name);
     }
@@ -143,7 +162,7 @@ export const hauler = {
         working: false,
         assignedSourceId: undefined,
         name: name,
-        state: CreepState.FILL_EXTENSION,
+        state: CreepState.FILL,
         minerName: undefined,
         path: undefined
       }

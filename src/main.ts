@@ -3,6 +3,7 @@ import {roomDirector} from "./roomDirector";
 import {jobs} from "./jobs";
 import {creepDirector} from "./creeps/creepDirector";
 import {prototypes} from "./prototypes";
+import {stats} from "./stats";
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
@@ -34,6 +35,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   initMemory();
 
+  stats.init();
+
   for (const name in Memory.creeps) {
     if (!(name in Game.creeps)) {
       let creep = Memory.creeps[name];
@@ -56,4 +59,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   roomDirector.run();
   creepDirector.run();
+
+  stats.run();
 });

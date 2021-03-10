@@ -2,6 +2,7 @@ import {CreepRole, CreepState, makeid} from "../common";
 import {worker} from "./types/worker";
 import {hauler} from "./types/hauler";
 import {miner} from "./types/miner";
+import {attacker} from "./types/attacker";
 
 export const creepSpawning = {
   createCreep(spawn: StructureSpawn, role: CreepRole, maxEnergy: number, room: Room): CreepSpawn<CreepMemory> {
@@ -12,6 +13,8 @@ export const creepSpawning = {
         return worker.create(room, spawn, maxEnergy);
       case CreepRole.HAULER:
         return hauler.create(room, spawn, maxEnergy);
+      case CreepRole.ATTACKER:
+        return attacker.create(room, spawn, maxEnergy);
     }
 
     // shouldnt get here

@@ -1,4 +1,4 @@
-import {addPos, CreepRole, CreepState, linearDist, makeid, roomPosToPos, subtractPos} from "../../common";
+import {addPos, CreepRole, CreepState, linearRoomDist, makeid, roomPosToPos, subtractPos} from "../../common";
 
 export const worker = {
   work(creep: Creep) {
@@ -101,7 +101,7 @@ export const worker = {
           let room = Memory.rooms[creep.memory.roomName];
           let spawnName = room.spawnNames[0];
           const structureSpawn = Game.spawns[spawnName];
-          if (linearDist(creep.pos, structureSpawn.pos) === 1) {
+          if (linearRoomDist(creep.pos, structureSpawn.pos) === 1) {
             let creepPos = roomPosToPos(creep.pos);
             const roomPos = roomPosToPos(structureSpawn.pos);
             const diff = subtractPos(creepPos, roomPos);

@@ -1,6 +1,7 @@
 import {creepManager} from "./creeps/creepManager";
 import {buildingManager} from "./buildings/buildingManager";
 import {CreepRole} from "./common";
+import {buildingDirector} from "./buildings/buildingDirector";
 
 export const roomDirector = {
 
@@ -43,6 +44,10 @@ export const roomDirector = {
     if (Game.time % 20 == 1) {
       buildingManager.manage(roomName);
     }
+
+    buildingDirector.run(roomName)
+
+
   },
 
   getAvailableSpots(room: Room, pos: RoomPosition): number {

@@ -35,6 +35,16 @@ interface HaulerMemory extends CreepMemory {
 
 }
 
+declare class Attacker extends Creep {
+  memory: AttackerMemory;
+}
+
+interface AttackerMemory extends CreepMemory {
+  targetFlagName: string | undefined;
+  movePath: PathStep[] | undefined;
+  lastRoomName: string | undefined;
+}
+
 interface Memory {
   uuid: number;
   log: any;
@@ -43,7 +53,8 @@ interface Memory {
   spawningSpawnNames: string[];
   sourceMemories: CustomMemories;
   controllerMemories: CustomMemories;
-  misc: any
+  misc: any,
+  stats: any
 }
 
 interface CustomMemory {}
@@ -71,6 +82,11 @@ interface RoomMemory {
   sourceIds: Id<MemSource>[];
   satelliteRoomNames: string[];
   creepNames: string[];
+  towerId: Id<StructureTower> | undefined;
+}
+
+interface FlagMemory {
+  attackerName: string | undefined;
 }
 
 interface MemSource extends Source {

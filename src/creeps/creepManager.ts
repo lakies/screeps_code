@@ -64,7 +64,15 @@ export const creepManager = {
 
       requiredCreeps[CreepRole.HAULER] += Object.keys(Game.creeps).filter(value => Game.creeps[value].memory.role === CreepRole.MINER).length;
 
-      requiredCreeps[CreepRole.WORKER] = 4;
+      requiredCreeps[CreepRole.WORKER] = 2;
+    }
+
+    for (const flagName in Game.flags) {
+      const flag = Game.flags[flagName];
+      if (flag.name.startsWith("attack_")) {
+        requiredCreeps[CreepRole.ATTACKER] = 1;
+        break;
+      }
     }
 
     // requiredCreeps[CreepRole.HAULER] = 2;
@@ -101,7 +109,6 @@ export const creepManager = {
         missingCreeps.push(creepSpawning.createCreep(Game.spawns[roomMemory.spawnNames[0]], parseInt(role), maxEnergy, room));
       }
     }
-
 
 
     return missingCreeps;
